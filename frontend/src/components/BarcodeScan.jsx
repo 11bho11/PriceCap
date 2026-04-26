@@ -1,26 +1,33 @@
 import { useEffect, useRef, useState } from 'react'
-import { Html5Qrcode } from 'html5-qrcode'
+import { BrowserMultiFormatReader } from '@zxing/browser'
 
-const API_BASE = 'http://localhost:8000'
+const API_BASE = ''
 
 function LoadingView() {
   return (
     <div style={{
       position: 'fixed', inset: 0, zIndex: 20,
-      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      background: 'rgba(10,10,10,0.92)'
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
       <div style={{
-        width: 48, height: 48, borderRadius: '50%',
-        border: '4px solid #333', borderTopColor: 'var(--accent-green)',
-        animation: 'spin 0.8s linear infinite'
-      }} />
-      <p style={{
-        color: 'var(--accent-green)', fontFamily: 'var(--font-main)',
-        marginTop: 16, letterSpacing: 2, fontSize: 14
+        background: 'rgba(10,10,10,0.82)',
+        border: '1px solid rgba(0,255,65,0.3)',
+        borderRadius: 16, padding: '32px 48px',
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        backdropFilter: 'blur(6px)',
       }}>
-        LOADING
-      </p>
+        <div style={{
+          width: 44, height: 44, borderRadius: '50%',
+          border: '3px solid #333', borderTopColor: 'var(--accent-green)',
+          animation: 'spin 0.8s linear infinite'
+        }} />
+        <p style={{
+          color: 'var(--accent-green)', fontFamily: 'var(--font-main)',
+          marginTop: 14, letterSpacing: 2, fontSize: 13
+        }}>
+          LOADING
+        </p>
+      </div>
     </div>
   )
 }
@@ -29,29 +36,37 @@ function SuccessView({ productName }) {
   return (
     <div style={{
       position: 'fixed', inset: 0, zIndex: 20,
-      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      background: 'rgba(10,10,10,0.95)', padding: '0 24px'
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      padding: '0 32px',
     }}>
       <div style={{
-        width: 72, height: 72, borderRadius: '50%',
-        border: '4px solid var(--accent-green)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 36, color: 'var(--accent-green)'
+        background: 'rgba(10,10,10,0.82)',
+        border: '1px solid rgba(0,255,65,0.3)',
+        borderRadius: 16, padding: '32px 28px',
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        backdropFilter: 'blur(6px)', width: '100%', maxWidth: 320,
       }}>
-        ✓
+        <div style={{
+          width: 64, height: 64, borderRadius: '50%',
+          border: '3px solid var(--accent-green)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 30, color: 'var(--accent-green)'
+        }}>
+          ✓
+        </div>
+        <p style={{
+          color: '#aaa', fontFamily: 'var(--font-main)',
+          marginTop: 16, fontSize: 12, letterSpacing: 1
+        }}>
+          Product scanned
+        </p>
+        <p style={{
+          color: 'var(--accent-green)', fontFamily: 'var(--font-main)',
+          marginTop: 8, fontSize: 17, textAlign: 'center', lineHeight: 1.4
+        }}>
+          {productName}
+        </p>
       </div>
-      <p style={{
-        color: '#aaa', fontFamily: 'var(--font-main)',
-        marginTop: 20, fontSize: 13, letterSpacing: 1
-      }}>
-        Product scanned
-      </p>
-      <p style={{
-        color: 'var(--accent-green)', fontFamily: 'var(--font-main)',
-        marginTop: 10, fontSize: 18, textAlign: 'center', lineHeight: 1.4
-      }}>
-        {productName}
-      </p>
     </div>
   )
 }
@@ -125,61 +140,79 @@ function ErrorOverlayPlaceholder({ type, onOk }) {
 export default function BarcodeScan({ onAdvance, onScanAgain, onError }) {
   const [scanState, setScanState] = useState('scanning')
   const [foundName, setFoundName] = useState(null)
-  const scannerRef = useRef(null)
+  const videoRef = useRef(null)
+  const controlsRef = useRef(null)
   const scannedRef = useRef(false)
 
   useEffect(() => {
-    const scanner = new Html5Qrcode('barcode-reader')
-    scannerRef.current = scanner
+    const reader = new BrowserMultiFormatReader()
 
-    scanner
-      .start(
-        { facingMode: 'environment' },
-        { fps: 10 },
-        handleBarcodeDetected,
-        () => {}
+    reader
+      .decodeFromConstraints(
+        { video: { facingMode: 'environment' } },
+        videoRef.current,
+        (result, err) => {
+          if (result && !scannedRef.current) {
+            handleBarcodeDetected(result.getText())
+          }
+        }
       )
-      .catch(() => setScanState('camera-error'))
+      .then(controls => {
+        controlsRef.current = controls
+      })
+      .catch(err => {
+        if (err?.name === 'NotAllowedError') {
+          setScanState('camera-error')
+        } else {
+          setScanState('camera-error')
+        }
+      })
 
     return () => {
-      scanner.stop().catch(() => {})
+      controlsRef.current?.stop()
     }
   }, [])
 
   async function handleBarcodeDetected(barcode) {
-    if (scannedRef.current) return
     scannedRef.current = true
-
-    try { await scannerRef.current.stop() } catch (_) {}
     setScanState('loading')
 
     try {
       const res = await fetch(`${API_BASE}/product/${barcode}`, { method: 'POST' })
       const data = await res.json()
       if (data.error === 'not_found') {
+        controlsRef.current?.stop()
         setScanState('not-found')
       } else {
         setFoundName(data.name)
         setScanState('success')
-        setTimeout(() => onAdvance(barcode, data.name), 1500)
+        setTimeout(() => {
+          controlsRef.current?.stop()
+          onAdvance(barcode, data.name)
+        }, 1500)
       }
     } catch {
+      controlsRef.current?.stop()
       setScanState(navigator.onLine ? 'not-found' : 'network-error')
     }
   }
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'var(--bg-color)' }}>
-      {/* Camera feed container — always in DOM so useEffect can target it, hidden when not scanning */}
-      <div
-        id="barcode-reader"
+      {/* Our own video element — full control over playsinline + sizing */}
+      <video
+        ref={videoRef}
+        autoPlay
+        playsInline
+        muted
         style={{
-          position: 'fixed', inset: 0, overflow: 'hidden',
-          visibility: scanState === 'scanning' ? 'visible' : 'hidden'
+          position: 'fixed', inset: 0,
+          width: '100vw', height: '100vh',
+          objectFit: 'cover',
+          visibility: ['scanning', 'loading', 'success'].includes(scanState) ? 'visible' : 'hidden'
         }}
       />
 
-      {/* Scanning UI — header, corner brackets, status pill */}
       {scanState === 'scanning' && (
         <>
           <div style={{
@@ -192,7 +225,6 @@ export default function BarcodeScan({ onAdvance, onScanAgain, onError }) {
             STEP 1 OF 2 — SCAN BARCODE
           </div>
 
-          {/* Corner bracket viewfinder — centered on screen */}
           <div style={{
             position: 'fixed', top: '50%', left: '50%',
             transform: 'translate(-50%, -50%)',
@@ -208,7 +240,6 @@ export default function BarcodeScan({ onAdvance, onScanAgain, onError }) {
             ))}
           </div>
 
-          {/* Status pill */}
           <div style={{
             position: 'fixed', bottom: 60, left: '50%',
             transform: 'translateX(-50%)',
@@ -229,14 +260,7 @@ export default function BarcodeScan({ onAdvance, onScanAgain, onError }) {
         <ErrorOverlayPlaceholder type={scanState} onOk={onError} />
       )}
 
-      <style>{`
-        @keyframes spin { to { transform: rotate(360deg); } }
-        #barcode-reader video {
-          width: 100% !important;
-          height: 100% !important;
-          object-fit: cover;
-        }
-      `}</style>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   )
 }

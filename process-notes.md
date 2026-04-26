@@ -60,6 +60,44 @@
 
 ## /build
 
+### Step 2: Global theme + App.jsx navigation shell
+
+- **What was built:** `index.html` updated with Share Tech Mono Google Fonts link and "PriceCap" title. `index.css` replaced entirely — Vite defaults removed, PriceCap CSS variables added (`--bg-color`, `--accent-green`, `--font-main`, `--color-fair`, `--color-above-market`, `--color-overpriced`, `--bubble-bg`) plus base resets. `App.jsx` rewritten with all five state variables (`currentScreen`, `barcode`, `productName`, `scannedPrice`, `verdictData`) and a `currentScreen` switch rendering stub divs for all five screens.
+- **Verification:** Dark background confirmed. Manually changing `useState('landing')` to `useState('step1')` switched the stub, then changed back — navigation switch confirmed working.
+- **Comprehension check:** "App.jsx is the parent" — correct. Ben understood that state lives at the top so it can flow down to children.
+- **Issues:** None.
+- **Learner engagement:** Clean run, no questions during the build.
+
+### Step 3: LandingPage + MatrixRain + HowItWorksModal
+
+- **What was built:** `MatrixRain.jsx` (canvas animation, requestAnimationFrame, 0/1 binary rain in #00FF41 with fade trail). `LandingPage.jsx` (Matrix rain background, £ shield SVG, tagline, SCAN BARCODE button wired to `onScanBarcode` prop, outlined HOW DOES IT WORK? button). `HowItWorksModal.jsx` (bottom-sheet, CSS slideUp animation, 3 step cards with green left-border, tap-outside + swipe-down dismiss). `App.jsx` updated to render `<LandingPage>` for the landing case.
+- **Verification:** Confirmed working — Matrix rain animating, logo and tagline visible, modal slides up and dismisses, SCAN BARCODE navigates to step1 stub.
+- **Comprehension check:** "In LandingPage.jsx, the SCAN BARCODE button calls onScanBarcode — where does that function actually come from?" → answered correctly: App.jsx passes it as a prop.
+- **Design question raised:** Ben asked when to suggest design changes — told him small tweaks now, bigger changes at /iterate.
+- **Issues:** None.
+
+### Step 4: FastAPI backbone — CORS, endpoint stubs, rate limiting, .env
+
+- **What was built:** `main.py` updated with `python-dotenv` (`load_dotenv()` at startup), `slowapi` rate limiter (20 req/min per IP, keyed by remote address, 429 error handler registered). Three stub endpoints added: `POST /product/{barcode}` (returns placeholder product name), `POST /ocr` (accepts file upload via `python-multipart`, returns placeholder price), `POST /verdict` (accepts `VerdictRequest` Pydantic body, returns placeholder FAIR verdict echoing back scanned_price). `python-multipart` added to `requirements.txt` — required by FastAPI for file upload handling. `.env` placeholder was already in place from Step 1.
+- **Issues:** FastAPI raised a `RuntimeError` at import time because `python-multipart` was missing — installed and added to `requirements.txt`. Import check passed cleanly after install.
+- **Learner engagement:** No questions raised during this step.
+
+### Step 5: Open Food Facts service + /product/{barcode} endpoint
+
+- **What was built:** `backend/services/` directory created. `services/openfoodfacts.py` written — async `httpx` call to Open Food Facts v2 API, extracts `product_name`, returns `None` if not found. `main.py` updated to import and call the service; endpoint now returns `{"name": "..."}` or `{"error": "not_found"}`.
+- **Issue encountered:** Spec had the wrong domain (`world.openfoodfacts.net` returns 404 for most barcodes). Fixed to `world.openfoodfacts.org`. The specific barcode in the spec (`5000169105017`) is also not in the Open Food Facts database — used Nutella (`3017620422003`) for verification instead.
+- **Learner observation (verification):** Nutella barcode returned product name correctly. Fake barcode returned `not_found` correctly.
+- **Learner concern raised:** Open Food Facts coverage is patchy — some common products not found. Acknowledged as a real limitation of the crowdsourced database; noted that the "Product Not Found" fallback in Step 6 handles it, and that branded goods likely to have SerpAPI results also tend to be in Open Food Facts.
+- **Comprehension check:** "What's the main reason for splitting the API logic into a service file?" → answered correctly: separation of concerns.
+
+### Step 6: BarcodeScan.jsx — camera, html5-qrcode, loading + success + error states
+
+- **What was built:** `BarcodeScan.jsx` using `@zxing/browser` (swapped from html5-qrcode after iOS black screen issue). Own `<video>` element with `playsInline` + `autoPlay` passed to the ZXing reader — full control over camera rendering. State machine: scanning → loading → success/not-found/error. Loading and success states float as frosted-glass cards over the live camera feed (camera stream kept running until API call resolves). `App.jsx` updated with `step1Key` state to force remount on SCAN AGAIN.
+- **Issues encountered:** html5-qrcode rendered a black screen on iOS Safari — root cause was the library managing its own video element without `playsInline`. Switched to `@zxing/browser` with our own video ref. Second issue: loading/success overlays appeared over a black background because the camera was stopped on barcode detect. Fixed by keeping the stream alive until the API call completes.
+- **Design change:** Ben requested loading and success states float over the camera feed rather than replacing it with a black screen. Implemented as semi-transparent frosted-glass cards (backdrop-filter blur) over the live video.
+- **Comprehension check:** "Why do we stop the camera only after the API call finishes?" → answered correctly: stopping the stream early makes the video go black, keeping it running lets the camera show through the overlay.
+- **Learner engagement:** Spotted the UX issue with the abrupt black background independently — good design instinct.
+
 ### Step 1: Full-stack project scaffold
 
 - **What was built:** Vite/React frontend scaffolded in `frontend/`. FastAPI backend created in `backend/` with `main.py` (CORS + `/ping` endpoint), `requirements.txt`, and `.env` placeholder. `.gitignore` added (covers node_modules, .env, __pycache__, venv, .claude). Frontend `App.jsx` wired to call `GET /ping` on mount via `useEffect` and log response to console. Git repo initialized and first commit made.
