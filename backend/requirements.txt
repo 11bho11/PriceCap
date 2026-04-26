@@ -2,6 +2,7 @@ fastapi
 uvicorn
 slowapi
 python-dotenv
+python-multipart
 pytesseract
 pillow
 httpx
