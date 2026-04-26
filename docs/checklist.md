@@ -12,7 +12,7 @@
 
 ## Checklist
 
-- [ ] **1. Full-stack project scaffold**
+- [x] **1. Full-stack project scaffold**
   Spec ref: `spec.md > File Structure` + `spec.md > Runtime & Deployment`
   What to build: Create the full folder structure (`pricecap/frontend/` and `pricecap/backend/`). Initialise the React/Vite frontend (`npm create vite@latest`). Initialise the FastAPI backend (`main.py`, `requirements.txt` with fastapi and uvicorn). Add a single test endpoint `GET /ping` that returns `{ "status": "ok" }`. Wire the frontend to call `/ping` on load and log the response to the browser console. Add `.gitignore` (node_modules, .env, __pycache__, venv).
   Acceptance: Running `npm run dev` starts the frontend. Running `uvicorn main:app --reload` starts the backend. Opening the browser and checking the console shows the `/ping` response logged — proof the two servers are connected over HTTP.

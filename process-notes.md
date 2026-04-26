@@ -58,3 +58,12 @@
 
 **Active shaping:** Minimal. Ben accepted the proposed sequence and items without modification. Did not question item order or suggest groupings. Engagement was cooperative but not directive — he was learning the sequencing logic rather than driving it.
 
+## /build
+
+### Step 1: Full-stack project scaffold
+
+- **What was built:** Vite/React frontend scaffolded in `frontend/`. FastAPI backend created in `backend/` with `main.py` (CORS + `/ping` endpoint), `requirements.txt`, and `.env` placeholder. `.gitignore` added (covers node_modules, .env, __pycache__, venv, .claude). Frontend `App.jsx` wired to call `GET /ping` on mount via `useEffect` and log response to console. Git repo initialized and first commit made.
+- **Verification:** Both dev servers started without errors. Browser console showed `/ping response: {status: 'ok'}` — confirmed frontend→backend HTTP connection working.
+- **Learner questions:** Asked what PowerShell is (clarified: same computer, text-based control). Asked whether two terminals = two separate computers (clarified: no, two programs running simultaneously on the same machine). Asked when git commit would happen (clarified: after each verified step). Asked about git credentials (clarified: not needed until Step 12 when pushing to GitHub).
+- **Active engagement:** Good questions about the tooling before running anything — Ben wanted to understand what he was running before he ran it.
+
