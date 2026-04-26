@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import './index.css'
 import LandingPage from './components/LandingPage'
+import BarcodeScan from './components/BarcodeScan'
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState('landing')
@@ -8,6 +9,7 @@ function App() {
   const [productName, setProductName] = useState(null)
   const [scannedPrice, setScannedPrice] = useState(null)
   const [verdictData, setVerdictData] = useState(null)
+  const [step1Key, setStep1Key] = useState(0)
 
   const stubStyle = {
     display: 'flex',
@@ -26,7 +28,18 @@ function App() {
       screen = <LandingPage onScanBarcode={() => setCurrentScreen('step1')} />
       break
     case 'step1':
-      screen = <div style={stubStyle}>step1</div>
+      screen = (
+        <BarcodeScan
+          key={step1Key}
+          onAdvance={(scannedBarcode, name) => {
+            setBarcode(scannedBarcode)
+            setProductName(name)
+            setCurrentScreen('step2')
+          }}
+          onScanAgain={() => setStep1Key(k => k + 1)}
+          onError={() => setCurrentScreen('landing')}
+        />
+      )
       break
     case 'step2':
       screen = <div style={stubStyle}>step2</div>
