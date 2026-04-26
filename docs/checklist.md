@@ -18,7 +18,7 @@
   Acceptance: Running `npm run dev` starts the frontend. Running `uvicorn main:app --reload` starts the backend. Opening the browser and checking the console shows the `/ping` response logged — proof the two servers are connected over HTTP.
   Verify: Start both dev servers. Open the browser at localhost:5173 (or whatever Vite assigns). Open browser DevTools → Console tab. Confirm you see `{ status: "ok" }` logged.
 
-- [ ] **2. Global theme + App.jsx navigation shell**
+- [x] **2. Global theme + App.jsx navigation shell**
   Spec ref: `spec.md > Frontend > index.css — Global Theme` + `spec.md > Frontend > App.jsx — Root Controller`
   What to build: Write `index.css` with all CSS variables (`--bg-color`, `--accent-green`, `--font-main`, `--color-fair`, `--color-above-market`, `--color-overpriced`, `--bubble-bg`). Add the Google Fonts `<link>` for Share Tech Mono in `index.html`. Write `App.jsx` with all five state variables (`currentScreen`, `barcode`, `productName`, `scannedPrice`, `verdictData`) and a `currentScreen` switch that renders placeholder `<div>` stubs for each screen: `landing`, `step1`, `step2`, `loading`, `verdict`. Each stub should display the screen name in white Share Tech Mono text on the dark background so you can confirm navigation works.
   Acceptance: The app loads with a dark background and Share Tech Mono font visible. Manually changing `currentScreen`'s initial value in the code switches which stub div is shown. All five state variables exist in App.jsx.
