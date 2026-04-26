@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './index.css'
+import LandingPage from './components/LandingPage'
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState('landing')
@@ -22,7 +23,7 @@ function App() {
   let screen
   switch (currentScreen) {
     case 'landing':
-      screen = <div style={stubStyle}>landing</div>
+      screen = <LandingPage onScanBarcode={() => setCurrentScreen('step1')} />
       break
     case 'step1':
       screen = <div style={stubStyle}>step1</div>
@@ -37,7 +38,7 @@ function App() {
       screen = <div style={stubStyle}>verdict</div>
       break
     default:
-      screen = <div style={stubStyle}>landing</div>
+      screen = <LandingPage onScanBarcode={() => setCurrentScreen('step1')} />
   }
 
   return screen

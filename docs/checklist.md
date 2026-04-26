@@ -24,7 +24,7 @@
   Acceptance: The app loads with a dark background and Share Tech Mono font visible. Manually changing `currentScreen`'s initial value in the code switches which stub div is shown. All five state variables exist in App.jsx.
   Verify: Run `npm run dev`. Confirm dark background (#0a0a0a) and Share Tech Mono font load. Temporarily change `useState('landing')` to `useState('step1')` — confirm the step1 stub renders. Change it back.
 
-- [ ] **3. LandingPage + MatrixRain + HowItWorksModal**
+- [x] **3. LandingPage + MatrixRain + HowItWorksModal**
   Spec ref: `spec.md > Frontend > LandingPage.jsx` + `spec.md > Frontend > MatrixRain` + `spec.md > Frontend > HowItWorksModal.jsx`
   What to build: Build `MatrixRain.jsx` — a `<canvas>` component rendering falling binary characters in neon green (#00FF41) on near-black. Build `LandingPage.jsx` — Matrix rain background, £ shield SVG logo, tagline "THE SYSTEM DOESN'T WANT YOU TO KNOW" in Share Tech Mono white, "SCAN BARCODE" primary button (neon green, full-width) that sets `currentScreen` to `'step1'`, and "HOW DOES IT WORK?" outlined secondary button that opens `HowItWorksModal`. Build `HowItWorksModal.jsx` — bottom-sheet that slides up from the bottom of the screen, containing 3 cards (Step 1: scan barcode, Step 2: scan shelf price, Step 3: get verdict). Dismiss by tapping outside or swiping down.
   Acceptance: Landing screen shows Matrix rain animation, £ shield logo, tagline, and both buttons. Tapping "HOW DOES IT WORK?" slides up the modal with 3 cards. Tapping outside or swiping down dismisses it. Tapping "SCAN BARCODE" switches the screen to the step1 stub.
