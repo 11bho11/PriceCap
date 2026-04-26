@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
+from services.openfoodfacts import get_product_name
 
 load_dotenv()
 
@@ -37,7 +38,10 @@ def ping():
 @app.post("/product/{barcode}")
 @limiter.limit("20/minute")
 async def get_product(barcode: str, request: Request):
-    return {"name": "Placeholder Product Name"}
+    name = await get_product_name(barcode)
+    if name is None:
+        return {"error": "not_found"}
+    return {"name": name}
 
 
 @app.post("/ocr")
