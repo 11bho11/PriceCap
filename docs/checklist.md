@@ -48,7 +48,7 @@
   Acceptance: Tapping SCAN BARCODE from the landing screen opens the camera. Pointing at a real product barcode auto-detects it, shows the loading state, then shows the product name. Auto-advances to step2 stub. A product not found shows the error card.
   Verify: Run both dev servers. Open the app on your phone (or browser). Tap SCAN BARCODE. Point camera at a product — confirm auto-scan, loading spinner, product name, then step2 stub appears. Test with an obscure product to trigger the "not found" state.
 
-- [ ] **7. pytesseract OCR service + `/ocr` endpoint**
+- [x] **7. pytesseract OCR service + `/ocr` endpoint**
   Spec ref: `spec.md > Backend > services/ocr.py` + `spec.md > Backend > Endpoints > POST /ocr`
   What to build: Install Tesseract OCR on your machine (required for pytesseract to work locally — follow the pytesseract docs for Windows install). Create `services/ocr.py`: accepts image bytes, runs `pytesseract.image_to_string()`, uses a regex to find the first price pattern (optional £, digits, optional decimal + digits), returns the price as a float or `None` if nothing found. Update the `/ocr` endpoint in `main.py` to accept a multipart file upload, pass the image to `ocr.py`, and return `{ "price": 2.49 }` or `{ "error": "no_price_detected" }`.
   Acceptance: Posting a photo of a price label to `/ocr` returns `{ "price": X.XX }`. Posting a blank image or a photo with no numbers returns `{ "error": "no_price_detected" }`.

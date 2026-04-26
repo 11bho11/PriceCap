@@ -7,6 +7,7 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from services.openfoodfacts import get_product_name
+from services.ocr import extract_price
 
 load_dotenv()
 
@@ -47,7 +48,11 @@ async def get_product(barcode: str, request: Request):
 @app.post("/ocr")
 @limiter.limit("20/minute")
 async def ocr(request: Request, file: UploadFile = File(...)):
-    return {"price": 1.99}
+    image_bytes = await file.read()
+    price = extract_price(image_bytes)
+    if price is None:
+        return {"error": "no_price_detected"}
+    return {"price": price}
 
 
 @app.post("/verdict")
