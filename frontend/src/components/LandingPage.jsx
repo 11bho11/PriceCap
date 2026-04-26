@@ -57,6 +57,19 @@ export default function LandingPage({ onScanBarcode }) {
       >
         <ShieldLogo />
 
+        <h1
+          style={{
+            fontFamily: 'var(--font-main)',
+            color: 'var(--accent-green)',
+            fontSize: 28,
+            letterSpacing: '0.2em',
+            textAlign: 'center',
+            margin: '-8px 0 0',
+          }}
+        >
+          PRICECAP
+        </h1>
+
         <p
           style={{
             fontFamily: 'var(--font-main)',

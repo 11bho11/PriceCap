@@ -20,19 +20,23 @@ export default function MatrixRain() {
     resize()
     window.addEventListener('resize', resize)
 
+    let frame = 0
     const draw = () => {
-      ctx.fillStyle = 'rgba(10,10,10,0.05)'
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
-      ctx.fillStyle = '#00FF41'
-      ctx.font = `${fontSize}px monospace`
+      frame++
+      if (frame % 4 === 0) {
+        ctx.fillStyle = 'rgba(10,10,10,0.2)'
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+        ctx.fillStyle = 'rgba(0,255,65,0.32)'
+        ctx.font = `${fontSize}px monospace`
 
-      for (let i = 0; i < drops.length; i++) {
-        const char = Math.random() > 0.5 ? '1' : '0'
-        ctx.fillText(char, i * fontSize, drops[i] * fontSize)
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-          drops[i] = 0
+        for (let i = 0; i < drops.length; i++) {
+          const char = Math.random() > 0.5 ? '1' : '0'
+          ctx.fillText(char, i * fontSize, drops[i] * fontSize)
+          if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+            drops[i] = 0
+          }
+          drops[i]++
         }
-        drops[i]++
       }
 
       animId = requestAnimationFrame(draw)
@@ -49,7 +53,7 @@ export default function MatrixRain() {
   return (
     <canvas
       ref={canvasRef}
-      style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+      style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0.5 }}
     />
   )
 }
