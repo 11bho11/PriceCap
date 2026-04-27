@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import ErrorOverlay from './ErrorOverlay'
 
 const API_BASE = ''
 
@@ -85,7 +86,7 @@ export default function PriceScan({ barcode, productName, onAdvance, onBack, onE
       }
       captureTimerRef.current = setTimeout(captureAndSend, 4000)
     } catch {
-      onError()
+      setPhase('camera-error')
     }
   }
 
@@ -411,6 +412,10 @@ export default function PriceScan({ barcode, productName, onAdvance, onBack, onE
             />
           </div>
         </div>
+      )}
+
+      {phase === 'camera-error' && (
+        <ErrorOverlay type="camera-error" onOk={onError} />
       )}
 
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import MatrixRain from './MatrixRain'
 import VerdictTab from './VerdictTab'
+import ResultsTab from './ResultsTab'
 
 export default function VerdictScreen({ verdictData, onScanAgain }) {
   const [activeTab, setActiveTab] = useState('verdict')
@@ -50,12 +51,7 @@ export default function VerdictScreen({ verdictData, onScanAgain }) {
           {activeTab === 'verdict' ? (
             <VerdictTab verdictData={verdictData} />
           ) : (
-            <div style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              height: '200px', color: '#444', fontFamily: 'var(--font-main)', fontSize: 13
-            }}>
-              — Results tab coming in step 11 —
-            </div>
+            <ResultsTab verdictData={verdictData} />
           )}
         </div>
 

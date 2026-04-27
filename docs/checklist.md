@@ -72,7 +72,7 @@
   Acceptance: After confirming a price in Step 2, the Verdict screen appears with Matrix rain background. The correct badge (FAIR/ABOVE MARKET/OVERPRICED) displays with the pop animation. Suggestion bubbles appear for non-FAIR verdicts. SCAN AGAIN resets everything and returns to landing.
   Verify: Run the full flow end-to-end: landing → barcode scan → price scan → verdict. Confirm correct badge, animation, and suggestions. Tap SCAN AGAIN — confirm you're back on the landing screen with all state cleared.
 
-- [ ] **11. ResultsTab + ErrorOverlay**
+- [x] **11. ResultsTab + ErrorOverlay**
   Spec ref: `spec.md > Frontend > ResultsTab.jsx` + `spec.md > Frontend > ErrorOverlay.jsx`
   What to build: Build `ResultsTab.jsx` — retailer price table (each row: retailer name + price, "You paid £X.XX" as highlighted top row), price range meter (horizontal gradient bar green→yellow→red, left label = lowest price, right label = highest price, white vertical line at the scanned price's proportional position with a small label above it). Wire into `VerdictScreen`'s Results tab. Build `ErrorOverlay.jsx` — reusable centered modal overlay with two states: "No internet connection" (OK → landing) and "Camera access is required to use PriceCap" (OK → landing). Replace the placeholder ErrorOverlay in BarcodeScan.jsx and PriceScan.jsx with the real component.
   Acceptance: Tapping the Results tab on the Verdict screen shows the retailer table and price meter with the scanned price marked. The price meter marker is in the correct proportional position. Both error overlays appear on the correct trigger conditions and dismiss to the landing screen.
