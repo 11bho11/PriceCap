@@ -78,7 +78,7 @@
   Acceptance: Tapping the Results tab on the Verdict screen shows the retailer table and price meter with the scanned price marked. The price meter marker is in the correct proportional position. Both error overlays appear on the correct trigger conditions and dismiss to the landing screen.
   Verify: Complete a full scan flow — on the Verdict screen, tap Results tab. Confirm retailer table and price meter render correctly with the scanned price marked. Test error states: deny camera permission → confirm camera error overlay appears. (Simulate no internet by turning off wifi — confirm no internet overlay appears when a scan fires.)
 
-- [ ] **12. Deploy to Vercel (frontend) + Railway (backend)**
+- [x] **12. Deploy to Vercel (frontend) + Railway (backend)**
   Spec ref: `spec.md > Runtime & Deployment`
   What to build: Create a GitHub repo and push the full project. Deploy the frontend to Vercel — connect GitHub repo, set root directory to `frontend/`, deploy. Deploy the backend to Railway — connect GitHub repo, set root to `backend/`, add `SERPAPI_KEY` as an environment variable in Railway's settings, configure Tesseract install in the Railway build. Update CORS in `main.py` to allow the live Vercel domain (not just localhost). Update the frontend API base URL to point at the Railway backend URL instead of localhost. Push and confirm both deployments go live. Test the full scan flow on real mobile Safari using the Vercel URL.
   Acceptance: The app loads at the Vercel URL in mobile Safari. A full scan flow (barcode → price → verdict) completes successfully end-to-end using the live backend. CORS is not blocking any requests.

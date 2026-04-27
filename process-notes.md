@@ -139,6 +139,14 @@
 - **Issues:** None.
 - **Learner engagement:** Spotted the visual weakness in the meter labels unprompted and gave clear feedback. Good design instinct.
 
+### Step 12: Deploy to Vercel (frontend) + Railway (backend)
+
+- **What was built:** Backend deployed to Railway with `nixpacks.toml` (Tesseract install) and `Procfile` (uvicorn on `$PORT`). Frontend deployed to Vercel with `VITE_API_URL` pointing at Railway. CORS updated to accept Vercel domain via `FRONTEND_URL` env var. `ocr.py` Windows path made conditional via `platform.system()` check.
+- **Issues encountered:** Three bugs hit in sequence. (1) `VITE_API_URL` not set before first Vercel deploy — env var added and redeployed. (2) SerpAPI returning `{"error": "Google hasn't returned any results"}` — code was raising `RuntimeError` instead of returning `None`, crashing the `/verdict` endpoint with a 500; fixed to return `None` gracefully. (3) SerpAPI returning no results even for "Nutella" — Railway servers are in the US, so `gl=gb` alone wasn't enough; fixed by adding `"location": "United Kingdom"` to SerpAPI params.
+- **Verification:** Full scan flow confirmed working on phone — barcode scan, price entry, verdict displayed.
+- **Comprehension check:** "Why did VITE_API_URL require a redeploy?" → answered "Vercel caches the old value" (incorrect). Corrected: Vite replaces `import.meta.env.VITE_API_URL` with the literal string at build time — there's no variable at runtime, so a fresh build is required.
+- **Learner engagement:** Asked a sharp architectural question about why Vercel and Railway are separate services — understood the CDN vs. live process distinction after explanation.
+
 ### Step 1: Full-stack project scaffold
 
 - **What was built:** Vite/React frontend scaffolded in `frontend/`. FastAPI backend created in `backend/` with `main.py` (CORS + `/ping` endpoint), `requirements.txt`, and `.env` placeholder. `.gitignore` added (covers node_modules, .env, __pycache__, venv, .claude). Frontend `App.jsx` wired to call `GET /ping` on mount via `useEffect` and log response to console. Git repo initialized and first commit made.
