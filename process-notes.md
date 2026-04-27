@@ -130,6 +130,15 @@
 - **Issues:** None.
 - **Learner engagement:** Active on design — requested more visible price comparison and cheeky suggestion tone. Chose specific wording for the FAIR positive bubble.
 
+### Step 11: ResultsTab + ErrorOverlay
+
+- **What was built:** `ResultsTab.jsx` — retailer price table ("You paid" highlighted row at top, retailer rows with cheaper prices in green) and price range meter (green→yellow→red gradient bar, white marker line at scanned price position, min/max labels coloured to match bar ends). Wired into `VerdictScreen`'s Results tab replacing the stub. `ErrorOverlay.jsx` — shared component with camera-error and network-error states. Replaced inline `ErrorOverlayPlaceholder` in `BarcodeScan.jsx` with the real import. Updated `PriceScan.jsx` to set phase `'camera-error'` and show `ErrorOverlay` on camera denial (previously called `onError()` silently with no overlay shown).
+- **Learner verification:** Confirmed Results tab rendered correctly with retailer table and price meter. Error overlay confirmed working.
+- **Design change requested:** Price range meter moved above the retailer table. "PRICE RANGE" title and min/max labels made more visible — title colour lifted from `#555` to `#ccc`, labels now coloured green (min) and red (max) to match the gradient bar ends. Meter given a card background to read as a distinct section.
+- **Comprehension check:** "What's the main benefit of ErrorOverlay being a shared component?" → answered correctly: "One file, no drift" — one change updates both screens with no risk of them diverging.
+- **Issues:** None.
+- **Learner engagement:** Spotted the visual weakness in the meter labels unprompted and gave clear feedback. Good design instinct.
+
 ### Step 1: Full-stack project scaffold
 
 - **What was built:** Vite/React frontend scaffolded in `frontend/`. FastAPI backend created in `backend/` with `main.py` (CORS + `/ping` endpoint), `requirements.txt`, and `.env` placeholder. `.gitignore` added (covers node_modules, .env, __pycache__, venv, .claude). Frontend `App.jsx` wired to call `GET /ping` on mount via `useEffect` and log response to console. Git repo initialized and first commit made.
