@@ -6,7 +6,7 @@ Grocery chains are rolling out electronic shelf labels that enable real-time sur
 
 A web app for UK shoppers that compares supermarket shelf prices against live retailer data — in-store, in seconds. Scan a barcode, scan the shelf price, get a verdict: **FAIR**, **ABOVE MARKET**, or **OVERPRICED**.
 
-Built for the VibeJam Spring '26 Hackathon. Theme: Escape the Permanent Underclass
+Built for the **VibeJam Spring '26 Hackathon: Escape the Permanent Underclass**
 
 ---
 
