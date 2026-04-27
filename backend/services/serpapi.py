@@ -10,6 +10,7 @@ async def get_retailer_prices(product_name: str) -> list[dict] | None:
         "q": product_name,
         "gl": "gb",
         "hl": "en",
+        "location": "United Kingdom",
         "api_key": api_key,
     }
     async with httpx.AsyncClient(timeout=10) as client:
