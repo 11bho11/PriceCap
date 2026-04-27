@@ -18,7 +18,7 @@ async def get_retailer_prices(product_name: str) -> list[dict] | None:
         data = response.json()
 
     if "error" in data:
-        raise RuntimeError(f"SerpAPI error: {data['error']}")
+        return None
 
     results = data.get("shopping_results", [])
     if not results:
