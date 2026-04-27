@@ -2,6 +2,7 @@ import { useState } from 'react'
 import './index.css'
 import LandingPage from './components/LandingPage'
 import BarcodeScan from './components/BarcodeScan'
+import PriceScan from './components/PriceScan'
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState('landing')
@@ -42,7 +43,18 @@ function App() {
       )
       break
     case 'step2':
-      screen = <div style={stubStyle}>step2</div>
+      screen = (
+        <PriceScan
+          barcode={barcode}
+          productName={productName}
+          onAdvance={(price) => {
+            setScannedPrice(price)
+            setCurrentScreen('loading')
+          }}
+          onBack={() => setCurrentScreen('step1')}
+          onError={() => setCurrentScreen('landing')}
+        />
+      )
       break
     case 'loading':
       screen = <div style={stubStyle}>loading</div>
