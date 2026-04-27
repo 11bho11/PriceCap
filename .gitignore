@@ -5,3 +5,4 @@ venv/
 *.pyc
 dist/
 .claude/
+process-notes.md
