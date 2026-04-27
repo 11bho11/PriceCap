@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { BrowserMultiFormatReader } from '@zxing/browser'
 import ErrorOverlay from './ErrorOverlay'
 
-const API_BASE = ''
+const API_BASE = import.meta.env.VITE_API_URL || ''
 
 function LoadingView() {
   return (

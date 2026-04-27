@@ -3,9 +3,10 @@ import re
 import pytesseract
 from PIL import Image
 
-# On Windows, Tesseract installs to a fixed path that isn't always on PATH.
-# Pointing pytesseract directly at the binary avoids "not found" errors.
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+import platform
+
+if platform.system() == "Windows":
+    pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 # Matches: optional £, one or more digits, optional decimal point + digits
 _PRICE_RE = re.compile(r"£?(\d+(?:\.\d+)?)")

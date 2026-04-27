@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import ErrorOverlay from './ErrorOverlay'
 
-const API_BASE = ''
+const API_BASE = import.meta.env.VITE_API_URL || ''
 
 function ManualEntry({ value, onChange, error, onSubmit }) {
   return (

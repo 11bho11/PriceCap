@@ -6,7 +6,7 @@ import PriceScan from './components/PriceScan'
 import VerdictScreen from './components/VerdictScreen'
 import MatrixRain from './components/MatrixRain'
 
-const API_BASE = ''
+const API_BASE = import.meta.env.VITE_API_URL || ''
 
 function VerdictLoader({ barcode, productName, scannedPrice, onSuccess, onError }) {
   useEffect(() => {
