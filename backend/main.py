@@ -8,6 +8,7 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from services.openfoodfacts import get_product_name
 from services.ocr import extract_price
+from services.serpapi import get_retailer_prices
 
 load_dotenv()
 
@@ -58,13 +59,35 @@ async def ocr(request: Request, file: UploadFile = File(...)):
 @app.post("/verdict")
 @limiter.limit("20/minute")
 async def verdict(request: Request, body: VerdictRequest):
+    retailer_prices = await get_retailer_prices(body.product_name)
+
+    if not retailer_prices:
+        return {"error": "no_price_data"}
+
+    prices = [r["price"] for r in retailer_prices]
+    average = sum(prices) / len(prices)
+    diff_pct = (body.scanned_price - average) / average * 100
+
+    if diff_pct <= 5:
+        verdict_str = "FAIR"
+    elif diff_pct <= 25:
+        verdict_str = "ABOVE_MARKET"
+    else:
+        verdict_str = "OVERPRICED"
+
+    cheaper = sorted(
+        [r for r in retailer_prices if r["price"] < body.scanned_price],
+        key=lambda r: r["price"],
+    )
+    suggestions = [
+        f"{r['name']} has this for £{body.scanned_price - r['price']:.2f} less"
+        for r in cheaper[:2]
+    ]
+
     return {
-        "verdict": "FAIR",
+        "verdict": verdict_str,
         "scanned_price": body.scanned_price,
-        "average_price": 1.99,
-        "retailer_prices": [
-            {"name": "Tesco", "price": 1.99},
-            {"name": "Sainsbury's", "price": 2.09},
-        ],
-        "suggestions": [],
+        "average_price": round(average, 2),
+        "retailer_prices": retailer_prices,
+        "suggestions": suggestions,
     }
