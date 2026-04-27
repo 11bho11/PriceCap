@@ -1,8 +1,57 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './index.css'
 import LandingPage from './components/LandingPage'
 import BarcodeScan from './components/BarcodeScan'
 import PriceScan from './components/PriceScan'
+import VerdictScreen from './components/VerdictScreen'
+import MatrixRain from './components/MatrixRain'
+
+const API_BASE = ''
+
+function VerdictLoader({ barcode, productName, scannedPrice, onSuccess, onError }) {
+  useEffect(() => {
+    fetch(`${API_BASE}/verdict`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        barcode,
+        product_name: productName,
+        scanned_price: scannedPrice,
+      }),
+    })
+      .then(r => r.json())
+      .then(data => onSuccess(data))
+      .catch(() => onError())
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, background: 'var(--bg-color)',
+      display: 'flex', flexDirection: 'column', overflow: 'hidden'
+    }}>
+      <MatrixRain />
+      <div style={{
+        position: 'relative', zIndex: 10,
+        display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center',
+        height: '100%'
+      }}>
+        <div style={{
+          width: 44, height: 44, borderRadius: '50%',
+          border: '3px solid #333', borderTopColor: 'var(--accent-green)',
+          animation: 'spin 0.8s linear infinite'
+        }} />
+        <p style={{
+          color: 'var(--accent-green)', fontFamily: 'var(--font-main)',
+          marginTop: 16, letterSpacing: 3, fontSize: 13
+        }}>
+          LOADING
+        </p>
+      </div>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </div>
+  )
+}
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState('landing')
@@ -12,15 +61,13 @@ function App() {
   const [verdictData, setVerdictData] = useState(null)
   const [step1Key, setStep1Key] = useState(0)
 
-  const stubStyle = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '100vh',
-    fontFamily: 'var(--font-main)',
-    color: 'white',
-    fontSize: '24px',
-    background: 'var(--bg-color)',
+  function handleScanAgain() {
+    setBarcode(null)
+    setProductName(null)
+    setScannedPrice(null)
+    setVerdictData(null)
+    setStep1Key(k => k + 1)
+    setCurrentScreen('landing')
   }
 
   let screen
@@ -57,10 +104,26 @@ function App() {
       )
       break
     case 'loading':
-      screen = <div style={stubStyle}>loading</div>
+      screen = (
+        <VerdictLoader
+          barcode={barcode}
+          productName={productName}
+          scannedPrice={scannedPrice}
+          onSuccess={(data) => {
+            setVerdictData(data)
+            setCurrentScreen('verdict')
+          }}
+          onError={() => setCurrentScreen('landing')}
+        />
+      )
       break
     case 'verdict':
-      screen = <div style={stubStyle}>verdict</div>
+      screen = (
+        <VerdictScreen
+          verdictData={verdictData}
+          onScanAgain={handleScanAgain}
+        />
+      )
       break
     default:
       screen = <LandingPage onScanBarcode={() => setCurrentScreen('step1')} />

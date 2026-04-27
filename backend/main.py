@@ -79,9 +79,23 @@ async def verdict(request: Request, body: VerdictRequest):
         [r for r in retailer_prices if r["price"] < body.scanned_price],
         key=lambda r: r["price"],
     )
+
+    overpriced_templates = [
+        "Yikes. {name} has this for £{saving:.2f} less.",
+        "Ouch — {name} is £{saving:.2f} cheaper right now.",
+    ]
+    above_market_templates = [
+        "Ha! {name} has this for £{saving:.2f} less.",
+        "{name} is £{saving:.2f} cheaper if you can get there.",
+    ]
+    templates = overpriced_templates if verdict_str == "OVERPRICED" else above_market_templates
+
     suggestions = [
-        f"{r['name']} has this for £{body.scanned_price - r['price']:.2f} less"
-        for r in cheaper[:2]
+        templates[i % len(templates)].format(
+            name=r["name"],
+            saving=round(body.scanned_price - r["price"], 2),
+        )
+        for i, r in enumerate(cheaper[:2])
     ]
 
     return {

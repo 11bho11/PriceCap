@@ -98,6 +98,38 @@
 - **Comprehension check:** "Why do we stop the camera only after the API call finishes?" → answered correctly: stopping the stream early makes the video go black, keeping it running lets the camera show through the overlay.
 - **Learner engagement:** Spotted the UX issue with the abrupt black background independently — good design instinct.
 
+### Step 7: pytesseract OCR service + /ocr endpoint
+
+- **What was built:** `services/ocr.py` — accepts image bytes, opens via `io.BytesIO` + PIL, runs `pytesseract.image_to_string()`, applies regex to extract first price pattern, returns float or None. `main.py` `/ocr` endpoint updated to read uploaded file bytes, call `extract_price`, and return `{"price": X}` or `{"error": "no_price_detected"}`. Tesseract v5.4.0 installed via winget (`UB-Mannheim.TesseractOCR`); path hard-coded in `ocr.py` to handle Windows PATH quirk.
+- **Verification:** Photo of price label → correct price returned. Blank image → `no_price_detected` error returned.
+- **Comprehension check:** "What does io.BytesIO(image_bytes) do?" → answered: "Saves the image to disk so PIL can open it" (incorrect). Corrected: BytesIO wraps bytes in a fake in-memory file-like object; PIL never touches the filesystem.
+- **Issues:** None in code. Tesseract binary not on PATH by default on Windows — handled by setting `pytesseract.tesseract_cmd` explicitly.
+- **Learner engagement:** No questions raised during build.
+
+### Step 8: PriceScan.jsx — camera capture, OCR flow, confirmation card, manual entry
+
+- **What was built:** `PriceScan.jsx` — full-screen camera feed via `getUserMedia`, viewfinder overlay, auto-capture after 4 seconds or on "SCAN NOW" tap. Frame captured via off-screen canvas `.toBlob()`, posted to `/ocr` as `multipart/form-data`. Four UI phases: scanning → loading → confirm (with ✓/✗) → manual entry. "Couldn't read price" failure state also drops into manual entry. "Enter price manually" always visible in scanning phase. Back arrow stops camera and returns to step1. `App.jsx` updated to render `PriceScan` for `step2` case; `onAdvance(price)` sets `scannedPrice` and moves to `loading` stub.
+- **Verification:** Full flow landing → Step 1 → Step 2 confirmed working. Camera showed with viewfinder. OCR ran and produced confirmation card or failure state. Back arrow returned to Step 1. Manual entry advanced to loading stub.
+- **Comprehension check:** "Why does useRef work better than useState for the capture guard?" → answered correctly: "useRef persists across renders without triggering one."
+- **Issues:** None.
+- **Learner engagement:** No questions raised during build.
+
+### Step 9: SerpAPI service + /verdict endpoint + verdict logic
+
+- **What was built:** `services/serpapi.py` — async httpx call to SerpAPI Google Shopping with `gl=gb`, `hl=en`. Filters results to known major UK retailers via a compiled regex pattern. Caps at 8 results sorted cheapest first. Each result includes `name`, `price` (from `extracted_price`), and `url` (from `product_link`). `/verdict` endpoint in `main.py` updated with full logic: average price, diff_pct, FAIR/ABOVE_MARKET/OVERPRICED bucketing, suggestion strings for cheaper retailers.
+- **Issues encountered:** Initial params (`gl=uk`, `google_domain=google.co.uk`) returned "Google hasn't returned any results" — fixed by switching to `gl=gb`, `hl=en`, dropping `google_domain`. Field name was `product_link` not `link` (discovered via debug print). `extracted_price` (pre-parsed float) was used instead of regex on price string after seeing the response keys.
+- **Learner-initiated changes:** Ben spotted that unfiltered results included unknown retailers and requested a major-retailers-only filter. Also requested URLs to be included for frontend linking. Both added during the step.
+- **Comprehension check:** "Why parse the price string with regex instead of using extracted_price?" — answered that `extracted_price` being null/missing would make the result invalid. Corrected: `extracted_price` is the right field to use (SerpAPI already parsed it); regex was unnecessary. Code updated to use `extracted_price` immediately.
+- **Learner engagement:** Active and directive — spotted two real product improvements (retailer filtering, URL inclusion) unprompted. Good instincts.
+
+### Step 10: VerdictScreen + VerdictTab — badge, suggestion bubbles, SCAN AGAIN
+
+- **What was built:** `VerdictScreen.jsx` — Matrix rain background, VERDICT header, two-tab bar (Verdict / Results), scrollable content area, SCAN AGAIN button. `VerdictTab.jsx` — three badge states (shield/triangle/bell), pop-in animation with cubic-bezier bounce, YOU PAID / UK AVERAGE stat block, iMessage-style suggestion bubbles. `VerdictLoader` component added inline to `App.jsx` — fires POST /verdict on mount, shows Matrix rain + spinner while waiting, transitions to verdict on success. Results tab left as a stub for step 11.
+- **Verification:** Full end-to-end flow confirmed working. Correct badge, animation, and suggestions displayed. SCAN AGAIN reset all state and returned to landing.
+- **Design changes requested:** Price comparison display (was tiny grey text) replaced with a prominent two-column stat block (YOU PAID in badge colour, UK AVERAGE in white, both at 22px). Suggestion strings made cheeky — OVERPRICED uses "Yikes." / "Ouch —" openers, ABOVE MARKET uses "Ha!" / retailer + savings framing. FAIR verdict given a positive iMessage bubble: "Nicely played. That's already one of the better prices out there."
+- **Issues:** None.
+- **Learner engagement:** Active on design — requested more visible price comparison and cheeky suggestion tone. Chose specific wording for the FAIR positive bubble.
+
 ### Step 1: Full-stack project scaffold
 
 - **What was built:** Vite/React frontend scaffolded in `frontend/`. FastAPI backend created in `backend/` with `main.py` (CORS + `/ping` endpoint), `requirements.txt`, and `.env` placeholder. `.gitignore` added (covers node_modules, .env, __pycache__, venv, .claude). Frontend `App.jsx` wired to call `GET /ping` on mount via `useEffect` and log response to console. Git repo initialized and first commit made.
