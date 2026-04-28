@@ -1,6 +1,4 @@
-# PriceCap
-
-**THE SYSTEM DOESN'T WANT YOU TO KNOW**
+# PriceCap - THE SYSTEM DOESN'T WANT YOU TO KNOW
 
 Grocery chains are rolling out electronic shelf labels that enable real-time surge pricing. PriceCap is the consumer counter-move — instant price transparency, no account required, no planning needed. Built for shoppers who want to know if they're being ripped off before they put something in the basket.
 
